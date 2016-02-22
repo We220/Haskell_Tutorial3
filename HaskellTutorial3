@@ -1,0 +1,164 @@
+
+
+------------------------- Exercise 1
+
+
+partEvenOdd :: [Int] -> ([Int],[Int])
+partEvenOdd []     = ([],[])
+partEvenOdd (x:xs) | even x    = undefined
+                   | otherwise = undefined
+                 where
+                   (ys,zs) = partEvenOdd xs
+
+unZip :: [(a,b)] -> ([a],[b])
+unZip [] = ([],[])
+unZip ((x,y):zs) = undefined
+
+
+rev :: [a] -> [a]
+rev xs = r xs []
+  where
+    r = undefined
+
+
+------------------------- State
+
+type Variable = String
+
+type State = Variable -> Integer
+
+empty :: State
+empty _ = 0
+
+set :: Variable -> Integer -> State -> State
+set x n s = t
+  where
+     t y | x == y    = n
+         | otherwise = s y
+
+
+st1 :: State
+st1 = set "x" 3 (set "y" 5 empty)
+
+
+------------------------- Arithmetic expressions
+
+data Aexp = Num Integer
+          | Var Variable
+          | Aexp :+: Aexp
+          | Aexp :-: Aexp
+          | Aexp :*: Aexp
+
+
+a1 :: Aexp
+a1 = Var "x" :+: (Var "y" :*: Num 7)
+
+a2 :: Aexp
+a2 = Var "y" :-: (Var "x" :*: Var "x")
+
+
+evalA :: Aexp -> State -> Integer
+evalA (Num n)   _ = n
+evalA (Var v)   s = s v
+evalA (a :+: b) s = evalA a s + evalA b s
+evalA (a :*: b) s = evalA a s * evalA b s
+evalA (a :-: b) s = evalA a s - evalA b s
+
+
+------------------------- Exercise 2
+
+data Bexp = Undefined
+
+-- b1 :: Bexp
+-- b1 = Neg (a1 :==: a2) :&: (a2 :<=: a1)
+
+
+------------------------- Exercise 3
+
+evalB = undefined
+
+
+------------------------- Commands
+
+data Comm = Skip
+          | Variable :=: Aexp
+          | Comm :>: Comm
+          | If Bexp Comm Comm
+          | While Bexp Comm
+
+
+------------------------- Exercise 4
+
+evalC :: Comm -> State -> State
+evalC Skip        s = s
+evalC (v :=: a)   s = undefined
+evalC (c :>: d)   s = evalC d (evalC c s)
+evalC (If b c d)  s | evalB b s = undefined
+                    | otherwise = undefined
+evalC (While b c) s = undefined
+
+
+------------------------- Programs
+
+{-
+
+-- Sign
+
+sign :: Comm
+sign = If (Num 1 :<=: Var "x") ("x" :=: Num 1) (
+       If (Num 0 :==: Var "x") Skip (
+        "x" :=: Num (-1)
+       ))
+
+runSign :: Integer -> Integer
+runSign n = evalC sign (set "x" n empty) "x"
+
+
+-- Factorial
+
+factorial :: Comm
+factorial = ("y" :=: Num 1) :>: 
+            While (Num 1 :<=: Var "x") (
+              ("y" :=: (Var "x" :*: Var "y")) :>:
+              ("x"  :=: (Var "x" :-: Num 1))
+            )
+
+runFactorial :: Integer -> Integer
+runFactorial n = t "y"
+  where 
+    s = set "x" n empty
+    t = evalC factorial s
+
+
+------------------------- Exercise 5
+
+-- Fibonacci
+
+fibonacci :: Comm
+fibonacci = ("y" :=: Num 1) :>:
+            ("z" :=: Num 1) :>:
+            While (Num 3 :<=: Var "n") (
+              undefined
+            )
+
+runFibonacci :: Integer -> Integer
+runFibonacci n = t "z"
+  where
+    s = set "n" n empty
+    t = evalC fibonacci s
+
+
+-- Euclid's algorithm
+
+euclid :: Comm
+euclid = undefined
+
+runEuclid :: Integer -> Integer -> Integer
+runEuclid n m = t "x"
+  where
+    s = set "x" n (set "y" m empty)
+    t = evalC euclid s
+
+-}
+
+
